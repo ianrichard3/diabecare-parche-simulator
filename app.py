@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 
 app = Flask(__name__)
@@ -14,6 +14,10 @@ trend_factors = {
     "rising": (3, 8),
     "rapidly_rising": (8, 16)
 }
+
+@app.route('/')
+def index():
+    return redirect(url_for('dashboard'))
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -57,4 +61,4 @@ def get_glucose():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5123)
+    app.run(host='0.0.0.0', port=5123)
