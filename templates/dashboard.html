@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard with Parameters</title>
+</head>
+<body>
+    <h1>Parameters Dashboard</h1>
+
+    <form method="POST" action="/dashboard">
+        <label for="trend">Select trend:</label>
+        <select name="trend" id="trend" required>
+            {% for option in trend_options %}
+                <option value="{{ option }}" {% if option == selected_trend %}selected{% endif %}>
+                    {{ option }}
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label for="number_value">Forced Glucose Level (0 - 600):</label>
+        <input type="number" id="number_value" name="number_value" min="0" max="600" required value="{{ number_value or '' }}">
+        <br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if selected_trend and number_value %}
+        <h2>Updated Parameters:</h2>
+        <p><strong>Trend:</strong> {{ selected_trend }}</p>
+        <p><strong>Forced Glucose Level:</strong> {{ number_value }}</p>
+    {% endif %}
+</body>
+</html>
