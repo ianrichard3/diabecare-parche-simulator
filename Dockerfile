@@ -11,7 +11,7 @@ COPY . .
 RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Expone el puerto interno (dentro del contenedor)
-EXPOSE 3001
+EXPOSE 7000
 
 # Comando para ejecutar la app
 CMD ["python", "app.py"]
