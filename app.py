@@ -61,4 +61,5 @@ def get_glucose():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5123)
+    port = 3001
+    app.run(host='0.0.0.0', port=port)
