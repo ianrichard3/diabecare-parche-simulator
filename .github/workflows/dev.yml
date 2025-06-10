@@ -10,25 +10,18 @@ jobs:
 
     steps:
 
+      - name: Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+
       - name: Configurar SSH y desplegar en Raspberry
-        run: |
-          echo "🔧 Verificando instalación de Tailscale..."
+        run: 
 
-          if ! command -v tailscale >/dev/null 2>&1; then
-            echo "📦 Tailscale no encontrado. Instalando..."
-            curl -fsSL https://tailscale.com/install.sh | sh
-            sudo tailscale up --auth-key=tskey-auth-kgbo8t1eLm11CNTRL-YYyu6Xk1d8WrXpiKT5nQ8WHnHbYhEEHwf
-          else
-            echo "✅ Tailscale ya está instalado."
-          fi
-
-          echo "$PI_SSH_PRIVATE_KEY" > key.pem
-          chmod 600 key.pem
-
-          SSH_CMD="ssh -i key.pem -o StrictHostKeyChecking=no -p $PI_SSH_PORT $PI_USER@$PI_HOST"
-
-          $SSH_CMD << 'EOF'
-          set -e
+          ssh -p ${{ secrets.PI_SSH_PORT }} -i ${{ secrets.PI_SSH_PRIVATE_KEY }} ${{ secrets.PI_USER }}@${{ secrets.PI_HOST }}
 
           echo "📥 Haciendo pull del simulador..."
           git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
