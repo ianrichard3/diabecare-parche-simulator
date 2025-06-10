@@ -9,31 +9,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Acceso vía SSH a Raspberry Pi y despliegue
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.PI_HOST }}
-          username: ${{ secrets.PI_USER }}
-          key: ${{ secrets.PI_SSH_PRIVATE_KEY }}
-          port: ${{ secrets.PI_SSH_PORT }}
-          script: |
-            set -e
-            echo "🔧 Verificando instalación de Tailscale..."
+      - name: Checkout del código
+        uses: actions/checkout@v4
 
-            if ! command -v tailscale >/dev/null 2>&1; then
-              echo "📦 Tailscale no encontrado. Instalando..."
-              curl -fsSL https://tailscale.com/install.sh | sh
-              sudo tailscale up --auth-key=tskey-auth-kdYxZUGje811CNTRL-kaMb6TmMcpaQJ3pJYAhypaeY7MbHz8Ne
-            else
-              echo "✅ Tailscale ya está instalado."
-            fi
+      - name: Configurar SSH y desplegar en Raspberry
+        run: |
+          echo "$PI_SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
 
-            echo "📥 Haciendo pull del simulador..."
-            git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
+          SSH_CMD="ssh -i key.pem -o StrictHostKeyChecking=no -p $PI_SSH_PORT $PI_USER@$PI_HOST"
 
-            echo "🚀 Desplegando con Docker Compose..."
-            cd /home/deshollinador/diabecare-infra/
-            docker compose down
-            docker compose up -d --build
+          $SSH_CMD << 'EOF'
+          set -e
+          echo "🔧 Verificando instalación de Tailscale..."
 
-            echo "✅ Despliegue completado."
+          if ! command -v tailscale >/dev/null 2>&1; then
+            echo "📦 Tailscale no encontrado. Instalando..."
+            curl -fsSL https://tailscale.com/install.sh | sh
+            sudo tailscale up --auth-key=tskey-auth-kdYxZUGje811CNTRL-kaMb6TmMcpaQJ3pJYAhypaeY7MbHz8Ne
+          else
+            echo "✅ Tailscale ya está instalado."
+          fi
+
+          echo "📥 Haciendo pull del simulador..."
+          git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
+
+          echo "🚀 Desplegando con Docker Compose..."
+          cd /home/deshollinador/diabecare-infra/
+          docker compose down
+          docker compose up -d --build
+
+          echo "✅ Despliegue completado."
+          EOF
+        env:
+          PI_HOST: ${{ secrets.PI_HOST }}
+          PI_USER: ${{ secrets.PI_USER }}
+          PI_SSH_PORT: ${{ secrets.PI_SSH_PORT }}
+          PI_SSH_PRIVATE_KEY: ${{ secrets.PI_SSH_PRIVATE_KEY }}
