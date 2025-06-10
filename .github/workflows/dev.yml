@@ -14,13 +14,6 @@ jobs:
 
       - name: Configurar SSH y desplegar en Raspberry
         run: |
-          echo "$PI_SSH_PRIVATE_KEY" > key.pem
-          chmod 600 key.pem
-
-          SSH_CMD="ssh -i key.pem -o StrictHostKeyChecking=no -p $PI_SSH_PORT $PI_USER@$PI_HOST"
-
-          $SSH_CMD << 'EOF'
-          set -e
           echo "🔧 Verificando instalación de Tailscale..."
 
           if ! command -v tailscale >/dev/null 2>&1; then
@@ -31,6 +24,14 @@ jobs:
             echo "✅ Tailscale ya está instalado."
           fi
 
+          echo "$PI_SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
+
+          SSH_CMD="ssh -i key.pem -o StrictHostKeyChecking=no -p $PI_SSH_PORT $PI_USER@$PI_HOST"
+
+          $SSH_CMD << 'EOF'
+          set -e
+          
           echo "📥 Haciendo pull del simulador..."
           git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
 
