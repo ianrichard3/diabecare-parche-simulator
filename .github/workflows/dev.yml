@@ -19,7 +19,11 @@ jobs:
 
       - name: Conectarse por SSH y desplegar
         run: |
-          ssh -o "StrictHostKeyChecking no" -p "$PI_SSH_PORT" "$PI_USER@$PI_HOST"
+          echo "$PI_SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
+
+          ssh -o StrictHostKeyChecking=no -i key.pem -p "$PI_SSH_PORT" "$PI_USER@$PI_HOST" << 'EOF'
+          set -e
 
           echo "📥 Haciendo pull del simulador..."
           git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
@@ -30,7 +34,9 @@ jobs:
           docker compose up -d --build
 
           echo "✅ Despliegue completado."
+          EOF
 
+          rm -f key.pem
         env:
           PI_HOST: ${{ secrets.PI_HOST }}
           PI_USER: ${{ secrets.PI_USER }}
