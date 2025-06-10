@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
 
       - name: Configurar SSH y desplegar en Raspberry
         run: |
@@ -19,7 +17,7 @@ jobs:
           if ! command -v tailscale >/dev/null 2>&1; then
             echo "📦 Tailscale no encontrado. Instalando..."
             curl -fsSL https://tailscale.com/install.sh | sh
-            sudo tailscale up --auth-key=tskey-auth-kdYxZUGje811CNTRL-kaMb6TmMcpaQJ3pJYAhypaeY7MbHz8Ne
+            sudo tailscale up --auth-key=tskey-auth-kgbo8t1eLm11CNTRL-YYyu6Xk1d8WrXpiKT5nQ8WHnHbYhEEHwf
           else
             echo "✅ Tailscale ya está instalado."
           fi
@@ -31,7 +29,7 @@ jobs:
 
           $SSH_CMD << 'EOF'
           set -e
-          
+
           echo "📥 Haciendo pull del simulador..."
           git -C /home/deshollinador/diabecare-infra/diabecare-parche-simulator pull origin dev
 
