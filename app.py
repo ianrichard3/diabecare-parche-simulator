@@ -26,16 +26,20 @@ def dashboard():
     trend_options = list(trend_factors.keys())
 
     if request.method == 'POST':
-        trend = request.form.get('trend')
-        number = request.form.get('number_value')
+        form_type = request.form.get('form_type')
 
-        if trend in trend_factors:
-            trend_level = trend
-        
-        try:
-            glucose_level = float(number)
-        except (TypeError, ValueError):
-            pass
+        if form_type == 'trend':
+            trend = request.form.get('trend')
+            if trend in trend_factors:
+                trend_level = trend
+
+        elif form_type == 'glucose':
+            number = request.form.get('number_value')
+            if number:
+                try:
+                    glucose_level = round(float(number))
+                except (TypeError, ValueError):
+                    pass
 
     return render_template(
         'dashboard.html',
@@ -45,6 +49,7 @@ def dashboard():
     )
 
 
+
 @app.route('/glucose', methods=['GET'])
 def get_glucose():
     global glucose_level, trend_level
@@ -52,7 +57,7 @@ def get_glucose():
     factor = trend_factors.get(trend_level, 1.0)
     random_variation = random.uniform(factor[0], factor[1])
     glucose_level += random_variation
-    glucose_level = round(glucose_level, 2)
+    glucose_level = round(glucose_level)
 
     return jsonify({
         "glucose_level": glucose_level,

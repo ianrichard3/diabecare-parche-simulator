@@ -1,34 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard with Parameters</title>
 </head>
+
 <body>
+
     <h1>Parameters Dashboard!!!!</h1>
 
+    <!-- FORMULARIO PARA CAMBIAR SOLO LA TENDENCIA -->
     <form method="POST" action="/dashboard">
+        <input type="hidden" name="form_type" value="trend">
         <label for="trend">Select trend:</label>
         <select name="trend" id="trend" required>
             {% for option in trend_options %}
-                <option value="{{ option }}" {% if option == selected_trend %}selected{% endif %}>
-                    {{ option }}
-                </option>
+            <option value="{{ option }}" {% if option==selected_trend %}selected{% endif %}>
+                {{ option }}
+            </option>
             {% endfor %}
         </select>
-        <br><br>
+        <button type="submit">Update Trend</button>
+    </form>
 
+    <br>
+
+    <!-- FORMULARIO PARA CAMBIAR SOLO EL VALOR FORZADO -->
+    <form method="POST" action="/dashboard">
+        <input type="hidden" name="form_type" value="glucose">
         <label for="number_value">Forced Glucose Level (0 - 600):</label>
-        <input type="number" id="number_value" name="number_value" min="0" max="600" required value="{{ number_value or '' }}">
-        <br><br>
-
-        <button type="submit">Submit</button>
+        <input type="number" id="number_value" name="number_value" min="0" max="600" step="1"
+            value="{{ number_value or '' }}">
+        <button type="submit">Update Glucose</button>
     </form>
 
     {% if selected_trend and number_value %}
-        <h2>Updated Parameters:</h2>
-        <p><strong>Trend:</strong> {{ selected_trend }}</p>
-        <p><strong>Forced Glucose Level:</strong> {{ number_value }}</p>
+    <h2>Estado actual:</h2>
+    <p><strong>Trend:</strong> {{ selected_trend }}</p>
+    <p><strong>Glucose Level:</strong> {{ number_value }}</p>
     {% endif %}
+
 </body>
+
 </html>
